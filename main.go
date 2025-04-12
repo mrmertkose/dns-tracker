@@ -14,7 +14,7 @@ func main() {
 		log.Fatalln("Config load error:", err)
 	}
 
-	w := writer.NewJSONWriter(cfg.LogDir)
+	w := writer.NewJSONDNSWriter(cfg.LogDir)
 
 	fmt.Println("listening dns packets:", cfg.InterfaceName)
 	if err = capture.ListenDNS(cfg.InterfaceName, w); err != nil {

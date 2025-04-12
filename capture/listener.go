@@ -11,7 +11,7 @@ import (
 	"github.com/google/gopacket/pcap"
 )
 
-func ListenDNS(interfaceName string, w *writer.JSONWriter) error {
+func ListenDNS(interfaceName string, w *writer.JSONDnsWriter) error {
 	handle, err := pcap.OpenLive(interfaceName, 65535, true, pcap.BlockForever)
 	if err != nil {
 		return err
@@ -44,13 +44,25 @@ func ListenDNS(interfaceName string, w *writer.JSONWriter) error {
 		q := dns.Questions[0]
 
 		logEntry := model.DNSLog{
-			Timestamp: time.Now(),
+			Timestamp: time.Now().Format("2006-01-02 15:04:05"),
 			SrcIP:     srcIP,
 			Query:     string(q.Name),
-			QType:     q.Type.String(),
 		}
 
-		if err = w.Write(logEntry); err != nil {
+		switch q.Type {
+		case layers.DNSTypeA:
+			logEntry.QType = "A"
+		case layers.DNSTypeAAAA:
+			logEntry.QType = "AAAA"
+		case layers.DNSTypeMX:
+			logEntry.QType = "MX"
+		default:
+			logEntry.QType = "Other"
+		}
+
+		//fmt.Println(logEntry)
+
+		if err = w.DnsWrite(logEntry); err != nil {
 			log.Println("write error:", err)
 		}
 	}

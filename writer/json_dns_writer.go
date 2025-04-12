@@ -3,20 +3,26 @@ package writer
 import (
 	"dns-tracker/model"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
 )
 
-type JSONWriter struct {
+type JSONDnsWriter struct {
 	logDir string
 }
 
-func NewJSONWriter(logDir string) *JSONWriter {
-	return &JSONWriter{logDir: logDir}
+func NewJSONDNSWriter(logDir string) *JSONDnsWriter {
+	return &JSONDnsWriter{logDir: logDir}
 }
 
-func (w *JSONWriter) Write(log model.DNSLog) error {
+func (w *JSONDnsWriter) DnsWrite(log model.DNSLog) error {
+	err := os.MkdirAll(w.logDir, 0755)
+	if err != nil {
+		return fmt.Errorf("log dir not created: %w", err)
+	}
+
 	filename := time.Now().Format("2006-01-02") + ".json"
 	fullPath := filepath.Join(w.logDir, filename)
 
