@@ -1,0 +1,4 @@
+{
+  "interface_name": "ens34",
+  "log_dir": "/var/log/dns-tracker"
+}
